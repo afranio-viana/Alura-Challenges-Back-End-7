@@ -27,4 +27,10 @@ public class DepoimentosController : ControllerBase
         return Ok();
     }
 
+    [HttpGet]
+    public async Task<IEnumerable<ReadDepoimentosDto>> RecuperarDepoimento()
+    {
+        return await _mongoDbService.GetAsync(_mapper);
+    }
+
 }
