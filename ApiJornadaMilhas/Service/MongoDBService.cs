@@ -32,4 +32,22 @@ public class MongoDBService {
         return  _mapper.Map<List<ReadDepoimentosDto>>(depoimentos);
     }
 
+    public async Task<ReadDepoimentosDto> GetAsyncById(IMapper _mapper, string id)
+    {
+        Depoimentos depoimento = await _depoimentosCollection.Find(depoimento => depoimento.Id == id).FirstOrDefaultAsync();
+        return _mapper.Map<ReadDepoimentosDto>(depoimento);
+    }   
+
+    public async Task PutAsync (string id, Depoimentos updateDepoimento)
+    {
+        await _depoimentosCollection.ReplaceOneAsync(depoimento => depoimento.Id == id, updateDepoimento);
+        return;
+    }
+
+    public async Task DeleteAsync(string id)
+    {
+        await _depoimentosCollection.DeleteOneAsync(depoimento => depoimento.Id == id);
+        return;
+    }
+
 }

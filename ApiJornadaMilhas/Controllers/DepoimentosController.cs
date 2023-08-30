@@ -33,4 +33,35 @@ public class DepoimentosController : ControllerBase
         return await _mongoDbService.GetAsync(_mapper);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> AtualizarDepoimento (string id, [FromBody] UpdateDepoimentosDto updateDepoimentosDto)
+    {
+        ReadDepoimentosDto depoimento= await _mongoDbService.GetAsyncById(_mapper, id);
+        try
+        {   
+            ReadDepoimentosDto novoUpdateDepoimentoDto = _mapper.Map<ReadDepoimentosDto>(updateDepoimentosDto);
+            novoUpdateDepoimentoDto.Id = depoimento.Id;
+            Depoimentos updateDepoimento = _mapper.Map<Depoimentos>(novoUpdateDepoimentoDto);
+            await _mongoDbService.PutAsync(id,updateDepoimento);
+            return NoContent();
+        }catch
+        {
+            return NotFound("Id não encontrado");
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletarDepoimentoPorId (string id)
+    {
+        ReadDepoimentosDto depoimento = await _mongoDbService.GetAsyncById(_mapper, id);
+        try
+        {
+            await _mongoDbService.DeleteAsync(depoimento.Id);
+            return NoContent();
+        }catch
+        {
+            return NotFound("Id não encontrado");
+        }
+    }
+
 }
