@@ -1,9 +1,12 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using MongoDB.Bson;
 using ApiJornadaMilhas.Models;
 using ApiJornadaMilhas.Data.Dto;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver.Linq;
 
 namespace ApiJornadaMilhas.Services;
 
@@ -36,6 +39,17 @@ public class MongoDBService {
     {
         Depoimentos depoimento = await _depoimentosCollection.Find(depoimento => depoimento.Id == id).FirstOrDefaultAsync();
         return _mapper.Map<ReadDepoimentosDto>(depoimento);
+    }
+    public async Task<int> GetAsyncSize ()
+    {
+        int tamanho = _depoimentosCollection.AsQueryable().Count();
+        return tamanho;
+    }   
+
+    public async Task<IEnumerable<ReadDepoimentosHomeDto>> GetAsyncRandom(IMapper _mapper)
+    {
+        List<Depoimentos> depoimentos =  _depoimentosCollection.AsQueryable().Sample(3).ToList();
+        return _mapper.Map<List<ReadDepoimentosHomeDto>>(depoimentos);
     }   
 
     public async Task PutAsync (string id, Depoimentos updateDepoimento)
