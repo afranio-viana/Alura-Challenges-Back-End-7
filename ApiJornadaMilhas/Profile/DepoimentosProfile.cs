@@ -14,5 +14,10 @@ public class DepoimentosProfile : Profile
         CreateMap<UpdateDepoimentosDto, ReadDepoimentosDto>();
         CreateMap<ReadDepoimentosDto, Depoimentos>();
         CreateMap<Depoimentos, ReadDepoimentosHomeDto>();
+
+        CreateMap<CreateDestinosDto, Destinos>();
+        CreateMap<Destinos, ReadDestinosDto>();
+        CreateMap<UpdateDestinosDto, ReadDestinosDto>();
+        CreateMap<ReadDestinosDto, Destinos>();
     }
 }

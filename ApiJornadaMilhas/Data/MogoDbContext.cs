@@ -16,4 +16,5 @@ public class MongoDbContext
     }
 
     public IMongoCollection<Depoimentos> Depoimentos => _database.GetCollection<Depoimentos>("Depoimentos");
+    public IMongoCollection<Destinos> Destinos => _database.GetCollection<Destinos>("Destinos");
 }

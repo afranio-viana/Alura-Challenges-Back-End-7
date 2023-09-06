@@ -8,19 +8,19 @@ namespace ApiJornadaMilhas.Controllers;
 
 [ApiController]
 [Route("depoimentos-home")]
-public class SortearDepoimentos : ControllerBase
+public class SortearDepoimentosController : ControllerBase
 {
     public MongoDBService _mongoDbService;
     public IMapper _mapper;
 
-    public SortearDepoimentos (MongoDBService mongoDbService, IMapper mapper)
+    public SortearDepoimentosController (MongoDBService mongoDbService, IMapper mapper)
     {
         _mongoDbService = mongoDbService;
         _mapper = mapper;
     }
 
     [HttpGet]
-    public async Task<IActionResult> SortearTresDepoimentos()
+    public async Task<IActionResult> SortearDepoimentos()
     {
         int tamanho =  await _mongoDbService.GetAsyncSize();
         if(tamanho>=3)

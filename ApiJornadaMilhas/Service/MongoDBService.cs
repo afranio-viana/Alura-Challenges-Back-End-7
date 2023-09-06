@@ -13,13 +13,16 @@ namespace ApiJornadaMilhas.Services;
 public class MongoDBService {
 
     private readonly IMongoCollection<Depoimentos> _depoimentosCollection;
+    private readonly IMongoCollection<Destinos> _destinosCollection;
 
     public MongoDBService(IOptions<MongoDBSettings> mongoDBSettings) {
         MongoClient client = new MongoClient(mongoDBSettings.Value.ConnectionURI);
         IMongoDatabase database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-        _depoimentosCollection = database.GetCollection<Depoimentos>(mongoDBSettings.Value.CollectionName); 
+        _depoimentosCollection = database.GetCollection<Depoimentos>(mongoDBSettings.Value.CollectionNameDepoimentos);
+        _destinosCollection = database.GetCollection<Destinos>(mongoDBSettings.Value.CollectionNameDestinos); 
     }
 
+    //DEPOIMENTOS
     
     //Um serviço para inserção no banco
     public async Task CreateAsync(Depoimentos depoimento)
@@ -64,4 +67,34 @@ public class MongoDBService {
         return;
     }
 
+    //Serviços de DESTINOS
+    public async Task CreateAsyncDestinos (Destinos destinos)
+    {
+        await _destinosCollection.InsertOneAsync(destinos);
+        return;
+    }
+
+    public async Task<IEnumerable<ReadDestinosDto>> GetAsyncDestinos(IMapper _mapper)
+    {
+        List<Destinos> destinos = await _destinosCollection.Find(new BsonDocument()).ToListAsync();
+        return _mapper.Map<List<ReadDestinosDto>>(destinos);
+    }
+
+    public async Task<ReadDestinosDto> GetASyncDestinosById (IMapper _mapper, string id)
+    {
+        Destinos destinos = await _destinosCollection.Find(destino => destino.Id == id).FirstOrDefaultAsync();
+        return _mapper.Map<ReadDestinosDto>(destinos);
+    }
+
+    public async Task PutAsyncDestinos(string id, Destinos updateDestinos)
+    {
+        await _destinosCollection.ReplaceOneAsync(destinos => destinos.Id == id, updateDestinos);
+        return;
+    }
+    
+    public async Task DeleteAsyncDestinos (string id)
+    {
+        await _destinosCollection.DeleteOneAsync(destinos => destinos.Id == id);
+        return;
+    }
 }

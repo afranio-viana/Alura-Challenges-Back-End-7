@@ -22,23 +22,36 @@ public class DepoimentosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AdicionarDepoimento ([FromBody] CreateDepoimentoDto depoimentoDto)
     {
-        Depoimentos depoimento = _mapper.Map<Depoimentos>(depoimentoDto);
-        await _mongoDbService.CreateAsync(depoimento);
-        return Ok();
+        try
+        {
+            Depoimentos depoimento = _mapper.Map<Depoimentos>(depoimentoDto);
+            await _mongoDbService.CreateAsync(depoimento);
+            return Ok();
+        }catch
+        {
+            return NotFound();
+        }
     }
 
     [HttpGet]
-    public async Task<IEnumerable<ReadDepoimentosDto>> RecuperarDepoimento()
+    public async Task<IActionResult> RecuperarDepoimento()
     {
-        return await _mongoDbService.GetAsync(_mapper);
+        try
+        {
+            IEnumerable<ReadDepoimentosDto> depoimentos = await _mongoDbService.GetAsync(_mapper); 
+            return Ok(depoimentos);
+        }catch
+        {
+            return NotFound("Ocorreu algum erro na solicitação!");
+        }
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> AtualizarDepoimento (string id, [FromBody] UpdateDepoimentosDto updateDepoimentosDto)
     {
-        ReadDepoimentosDto depoimento= await _mongoDbService.GetAsyncById(_mapper, id);
         try
         {   
+            ReadDepoimentosDto depoimento= await _mongoDbService.GetAsyncById(_mapper, id);
             ReadDepoimentosDto novoUpdateDepoimentoDto = _mapper.Map<ReadDepoimentosDto>(updateDepoimentosDto);
             novoUpdateDepoimentoDto.Id = depoimento.Id;
             Depoimentos updateDepoimento = _mapper.Map<Depoimentos>(novoUpdateDepoimentoDto);
