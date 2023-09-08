@@ -26,7 +26,7 @@ public class DepoimentosController : ControllerBase
         {
             Depoimentos depoimento = _mapper.Map<Depoimentos>(depoimentoDto);
             await _mongoDbService.CreateAsync(depoimento);
-            return Ok();
+            return CreatedAtAction(nameof(RecuperarDepoimentoPorId),new{id = depoimento.Id},depoimento);
         }catch
         {
             return NotFound();
@@ -40,6 +40,19 @@ public class DepoimentosController : ControllerBase
         {
             IEnumerable<ReadDepoimentosDto> depoimentos = await _mongoDbService.GetAsync(_mapper); 
             return Ok(depoimentos);
+        }catch
+        {
+            return NotFound("Ocorreu algum erro na solicitação!");
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> RecuperarDepoimentoPorId(string id)
+    {
+        try{
+            ReadDepoimentosDto depoimentosDto = await _mongoDbService.GetAsyncById(_mapper,id);
+            return Ok(depoimentosDto);
+
         }catch
         {
             return NotFound("Ocorreu algum erro na solicitação!");

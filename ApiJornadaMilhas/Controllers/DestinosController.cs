@@ -28,7 +28,7 @@ public class DestinosController : ControllerBase
         {
             Destinos destinos = _mapper.Map<Destinos>(destinosDto);
             await _mongoDBService.CreateAsyncDestinos(destinos);
-            return Ok();
+            return CreatedAtAction(nameof(RecuperarDestinoPorId),new{id = destinos.Id}, destinos);
         }catch
         {
             return NotFound();
@@ -84,23 +84,7 @@ public class DestinosController : ControllerBase
             return NotFound("Algo deu errado na solicitação!!!");
         }
     }
-    // [HttpGet("{nome}")]
-    // public async Task<IActionResult> RecuperarDestinoPorNome([FromQuery] string nome)
-    // {
-    //     try
-    //     {
-    //         IEnumerable<ReadDestinosDto> destinoDto = await _mongoDBService.GetASyncDestinosByName(_mapper, nome);
-    //         if (destinoDto != null){
-    //             return Ok (destinoDto);
-    //         }else
-    //         {
-    //             return NotFound ("O destino não foi encontrado!");
-    //         }
-    //     }catch
-    //     {
-    //         return NotFound("Algo deu errado na solicitação!!!");
-    //     }
-    // }
+   
     [HttpPut("{id}")]
     public async Task<IActionResult> AtualizarDestino (string id, [FromBody] UpdateDestinosDto updateDestinosDto)
     {
