@@ -4,6 +4,7 @@ using ApiJornadaMilhas.Services;
 using ApiJornadaMilhas.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 
 namespace ApiJornadaMilhas.Controllers;
 
@@ -39,9 +40,28 @@ public class DestinosController : ControllerBase
     {
         try
         {
-            IEnumerable<ReadDestinosDto> destinosDto = await _mongoDBService.GetAsyncDestinos(_mapper);
-            return Ok(destinosDto);
-        }catch
+            if(Request.Query.Count>0)
+            {
+                if (Request.Query.TryGetValue("nome",out StringValues nome))
+                {
+                    IEnumerable<ReadDestinosDto> destinosDto = await _mongoDBService.GetASyncDestinosByName(_mapper, nome);
+                    if(destinosDto.Any()){
+                        return Ok(destinosDto);
+                    }else
+                    {
+                        return NotFound("Destino não encontrado!");
+                    }
+                }else{
+                    return NotFound("Ocorreu algum erro na solicitação, verifique o caminho solicitado");
+                }
+            }
+            else
+            {
+                IEnumerable<ReadDestinosDto> destinosDto = await _mongoDBService.GetAsyncDestinos(_mapper);
+                return Ok(destinosDto);
+            }
+        }
+        catch
         {
             return NotFound("Ocorreu algum erro na solicitação ou o banco está vazio");
 
@@ -64,6 +84,23 @@ public class DestinosController : ControllerBase
             return NotFound("Algo deu errado na solicitação!!!");
         }
     }
+    // [HttpGet("{nome}")]
+    // public async Task<IActionResult> RecuperarDestinoPorNome([FromQuery] string nome)
+    // {
+    //     try
+    //     {
+    //         IEnumerable<ReadDestinosDto> destinoDto = await _mongoDBService.GetASyncDestinosByName(_mapper, nome);
+    //         if (destinoDto != null){
+    //             return Ok (destinoDto);
+    //         }else
+    //         {
+    //             return NotFound ("O destino não foi encontrado!");
+    //         }
+    //     }catch
+    //     {
+    //         return NotFound("Algo deu errado na solicitação!!!");
+    //     }
+    // }
     [HttpPut("{id}")]
     public async Task<IActionResult> AtualizarDestino (string id, [FromBody] UpdateDestinosDto updateDestinosDto)
     {

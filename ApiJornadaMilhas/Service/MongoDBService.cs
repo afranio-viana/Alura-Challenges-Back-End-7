@@ -86,6 +86,12 @@ public class MongoDBService {
         return _mapper.Map<ReadDestinosDto>(destinos);
     }
 
+    public async Task<IEnumerable<ReadDestinosDto>> GetASyncDestinosByName (IMapper _mapper, string nome)
+    {
+        List<Destinos> destinos = await _destinosCollection.Find(destino => destino.Nome.ToLower() == nome.ToLower()).ToListAsync();
+        return _mapper.Map<List<ReadDestinosDto>>(destinos);
+    }
+
     public async Task PutAsyncDestinos(string id, Destinos updateDestinos)
     {
         await _destinosCollection.ReplaceOneAsync(destinos => destinos.Id == id, updateDestinos);
