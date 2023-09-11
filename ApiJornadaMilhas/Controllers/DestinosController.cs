@@ -5,6 +5,7 @@ using ApiJornadaMilhas.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace ApiJornadaMilhas.Controllers;
 
@@ -94,7 +95,7 @@ public class DestinosController : ControllerBase
                 ReadDestinosDto novoUpdateDestinosDto = _mapper.Map<ReadDestinosDto>(updateDestinosDto);
                 novoUpdateDestinosDto.Id = destino.Id;
                 Destinos updateDestinos = _mapper.Map<Destinos>(novoUpdateDestinosDto);
-                await _mongoDBService.PutAsyncDestinos(id, updateDestinos);
+                await _mongoDBService.UpdateAsyncDestinos(id, updateDestinos);
                 return NoContent();
             }else
             {
@@ -103,6 +104,37 @@ public class DestinosController : ControllerBase
         }catch{
             return NotFound ("Ocorreu algum erro na solicitação!!!");
         }
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> AtualizarDestinoPatch(string id,JsonPatchDocument<UpdateDestinosDto> patch)
+    {
+        try
+        {
+            ReadDestinosDto destinosDto = await _mongoDBService.GetASyncDestinosById(_mapper, id);
+            if(destinosDto == null)
+            {
+                return NotFound("Destino não encotrado");
+            }else
+            {
+                UpdateDestinosDto updateDestinosDto = _mapper.Map<UpdateDestinosDto>(destinosDto);
+                patch.ApplyTo(updateDestinosDto, ModelState);
+                if (!TryValidateModel(updateDestinosDto))
+                {
+                    return ValidationProblem(ModelState);
+                }else
+                {
+                    _mapper.Map(updateDestinosDto, destinosDto);
+                    Destinos novoUpdateDestinos = _mapper.Map<Destinos>(destinosDto);
+                    await _mongoDBService.UpdateAsyncDestinos(id, novoUpdateDestinos);
+                    return NoContent();
+                }   
+            }
+        }catch
+        {
+            return NotFound("Algo deu errado na solicitação!!!");
+        }
+
     }
 
     

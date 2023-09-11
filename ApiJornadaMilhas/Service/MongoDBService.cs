@@ -7,6 +7,7 @@ using ApiJornadaMilhas.Data.Dto;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver.Linq;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace ApiJornadaMilhas.Services;
 
@@ -92,7 +93,7 @@ public class MongoDBService {
         return _mapper.Map<List<ReadDestinosDto>>(destinos);
     }
 
-    public async Task PutAsyncDestinos(string id, Destinos updateDestinos)
+    public async Task UpdateAsyncDestinos(string id, Destinos updateDestinos)
     {
         await _destinosCollection.ReplaceOneAsync(destinos => destinos.Id == id, updateDestinos);
         return;
