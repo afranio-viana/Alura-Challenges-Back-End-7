@@ -4,6 +4,13 @@ using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure a seção MongoDB no arquivo appsettings.json
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
+
+// Configure a seção MongoDB a partir dos segredos do usuário
+builder.Configuration.AddUserSecrets<Program>();
+
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
 builder.Services.AddSingleton<MongoDBService>();
 
